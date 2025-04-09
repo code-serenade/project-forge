@@ -1,0 +1,29 @@
+# 选择 Ubuntu 作为基础镜像
+FROM ubuntu:latest
+
+# 设置非交互模式，避免安装过程中出现交互提示
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 更新并安装必要的依赖
+RUN apt update && apt install -y \
+    curl \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 Rustup（Rust 官方推荐的安装方式）
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# 添加 Rust 到 PATH
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# 验证 Rust 安装
+RUN rustc --version && cargo --version
+
+# 设置默认工作目录
+WORKDIR /workspace
+
+# 进入交互模式
+CMD ["/bin/bash"]
