@@ -4,7 +4,7 @@
 RUNNER_NAME="gitlab-runner"
 
 # 配置路径（主机保存配置）
-CONFIG_DIR="$HOME//gitlab-runner/config"
+CONFIG_DIR="$HOME/gitlab-runner/config"
 
 # 镜像名
 IMAGE_NAME="gitlab/gitlab-runner:latest"
