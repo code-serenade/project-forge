@@ -1,0 +1,46 @@
+version: "3.8"
+
+stages:
+  - test
+  - build
+  - docker
+
+services:
+  docker:
+    image: docker:dind
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  DOCKER_REGISTRY: "localhost:5000"
+  IMAGE_NAME: "$DOCKER_REGISTRY/springboot-app"
+
+test:
+  stage: test
+  image: maven:3.9-eclipse-temurin-17
+  script:
+    - echo "🧪 运行测试..."
+    - mvn test
+
+build:
+  stage: build
+  image: maven:3.9-eclipse-temurin-17
+  script:
+    - echo "🛠️ 开始构建 Spring Boot 项目..."
+    - mvn clean install -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 30 minutes
+
+docker-build:
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login $DOCKER_REGISTRY -u $CI_REGISTRY_USER --password-stdin || true
+  script:
+    - echo "🐳 构建 Docker 镜像..."
+    - JAR_FILE=$(ls target/*.jar | head -n 1)
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_TAG --build-arg JAR_FILE=$JAR_FILE .
+    - docker push $IMAGE_NAME:$CI_COMMIT_TAG
