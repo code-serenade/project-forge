@@ -50,8 +50,6 @@ docker exec -it $RUNNER_NAME gitlab-runner register \
   --url "$GITLAB_URL" \
   --token "$AUTH_TOKEN" \
   --executor "$EXECUTOR" \
-  --description "$DESCRIPTION" \
-  --tag-list "$TAGS" \
   --docker-image "$DEFAULT_IMAGE"
 
 echo
